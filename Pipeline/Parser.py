@@ -10,3 +10,20 @@ The parser is looking for:
 """
 
 
+import xml.etree.ElementTree as ET
+import json
+import os
+
+#Temp path to .mzML file
+mzml_path = "data/sample.mzML"
+
+#Parsing the XML file
+tree = ET.parse(mzml_path)
+root = tree.getroot()
+
+#Handle XML namespace
+#ns = {"mzml" : }
+
+#collect spectrum data
+spectra_data = []
+
