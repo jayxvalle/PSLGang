@@ -77,7 +77,7 @@ def parse_mzml(mzml_path):
                 ms_level_param = dict(param.attrib)
 
             # base peak m/z: accession MS:1000504
-            if accession == "MS:1000504" or name == "base peak mz":
+            if accession == "MS:1000504" or name == "base peak m/z":
                 base_peak_mz = dict(param.attrib)
 
             # base peak intensity: accession MS:1000505
