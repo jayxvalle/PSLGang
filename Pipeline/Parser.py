@@ -16,6 +16,7 @@ import json
 import os
 import sys
 
+
 # Temp path to .mzML file (will prefer a file in the Data/ folder if present)
 script_dir = os.path.dirname(os.path.abspath(__file__))
 repo_root = os.path.abspath(os.path.join(script_dir, ".."))
@@ -24,7 +25,6 @@ default_paths = [
     os.path.join(repo_root, "Data", "CVBS_1_Dis_neg_1.mzML"),
     os.path.join(repo_root, "data", "sample.mzML"),
 ]
-
 if len(sys.argv) > 1:
     mzml_path = sys.argv[1]
 else:
@@ -41,7 +41,7 @@ else:
 def parse_mzml(mzml_path):
     if not os.path.exists(mzml_path):
         raise FileNotFoundError(f"mzML file not found: {mzml_path}")
-
+    
     tree = ET.parse(mzml_path)
     root = tree.getroot()
 
@@ -64,6 +64,7 @@ def parse_mzml(mzml_path):
 
         # We'll capture the ms level cvParam and the base peak intensity cvParam
         ms_level_param = None
+        base_peak_mz = None
         base_peak_param = None
 
         for param in spectrum.findall(cvparam_expr, ns if ns else None):
@@ -75,6 +76,10 @@ def parse_mzml(mzml_path):
             if accession == "MS:1000511" or name == "ms level":
                 ms_level_param = dict(param.attrib)
 
+            # base peak m/z: accession MS:1000504
+            if accession == "MS:1000504" or name == "base peak mz":
+                base_peak_mz = dict(param.attrib)
+
             # base peak intensity: accession MS:1000505
             if accession == "MS:1000505" or name == "base peak intensity":
                 base_peak_param = dict(param.attrib)
@@ -85,6 +90,7 @@ def parse_mzml(mzml_path):
             spectra_data.append({
                 "id": spec_id,
                 "ms_level": ms_level_param,
+                "base_peak_mz": base_peak_mz,
                 "base_peak_intensity": base_peak_param,
             })
 
