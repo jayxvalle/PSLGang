@@ -17,8 +17,6 @@ import os
 import sys
 
 # Temp path to .mzML file (will prefer a file in the Data/ folder if present)
-# Resolve paths relative to this script file so the script behaves the same
-# regardless of the current working directory.
 script_dir = os.path.dirname(os.path.abspath(__file__))
 repo_root = os.path.abspath(os.path.join(script_dir, ".."))
 
