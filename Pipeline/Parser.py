@@ -15,6 +15,7 @@ import xml.etree.ElementTree as ET
 import json
 import os
 import sys
+import matplotlib.pyplot as plt
 
 
 # Temp path to .mzML file (will prefer a file in the Data/ folder if present)
@@ -61,37 +62,34 @@ def parse_mzml(mzml_path):
 
     for spectrum in spectrum_iter:
         spec_id = spectrum.get("id")
+        
+        # grabbing only the "scan=1"
+        match = re.search(r"(scan=\d+)", spec_id or "")
+        spec_id = match.group(1) if match else spec_id
 
         # We'll capture the ms level cvParam and the base peak intensity cvParam
-        ms_level_param = None
+        ms_level = None
         base_peak_mz = None
-        base_peak_param = None
+        base_peak_intensity = None
 
         for param in spectrum.findall(cvparam_expr, ns if ns else None):
-            accession = param.get("accession")
             name = param.get("name")
             value = param.get("value")
 
-            # ms level: accession MS:1000511 (name "ms level")
-            if accession == "MS:1000511" or name == "ms level":
-                ms_level_param = dict(param.attrib)
-
-            # base peak m/z: accession MS:1000504
-            if accession == "MS:1000504" or name == "base peak m/z":
-                base_peak_mz = dict(param.attrib)
-
-            # base peak intensity: accession MS:1000505
-            if accession == "MS:1000505" or name == "base peak intensity":
-                base_peak_param = dict(param.attrib)
+            if name == "ms level":
+                ms_level = value
+            elif name == "base peak m/z":
+                base_peak_mz = value
+            elif name == "base peak intensity":
+                base_peak_intensity = value
 
         # Only keep spectra where ms level == "1"
-        ms_level_value = ms_level_param.get("value") if ms_level_param else None
-        if ms_level_value == "1":
+        if ms_level == "1":
             spectra_data.append({
                 "id": spec_id,
-                "ms_level": ms_level_param,
+                "ms_level": ms_level,
                 "base_peak_mz": base_peak_mz,
-                "base_peak_intensity": base_peak_param,
+                "base_peak_intensity": base_peak_intensity,
             })
 
     return spectra_data
@@ -102,7 +100,7 @@ if __name__ == "__main__":
         spectra = parse_mzml(mzml_path)
 
         base_name = os.path.splitext(os.path.basename(mzml_path))[0]
-        output_path = os.path.join(os.path.dirname(mzml_path), f"{base_name}.mslevel1.json")
+        output_path = os.path.join(os.path.dirname(mzml_path), f"{base_name}.json")
 
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(spectra, f, indent=2)
