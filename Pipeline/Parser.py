@@ -62,12 +62,12 @@ def parse_mzml(mzml_path):
 
     for spectrum in spectrum_iter:
         spec_id = spectrum.get("id")
-        
-        # grabbing only the "scan=1"
+
+        # Using a regular expression to extract just the "scan="" part, then fallback to original if no match
         match = re.search(r"(scan=\d+)", spec_id or "")
         spec_id = match.group(1) if match else spec_id
 
-        # We'll capture the ms level cvParam and the base peak intensity cvParam
+        # Extracting only the value for each measurement to simplify output.
         ms_level = None
         base_peak_mz = None
         base_peak_intensity = None
