@@ -29,6 +29,17 @@ import json
 import os
 import sys
 
+# -------------------------------------------------------------------
+# File Path Setup
+# -------------------------------------------------------------------
+# The script supports two ways to locate the .mzML input file:
+#   1. Command-line argument: python Parser.py /path/to/file.mzML
+#   2. Default search: automatically checks known locations under Data/ or data/
+#
+# Example:
+#   - PSLGang/Data/CVBS_1_Dis_neg_1.mzML
+#
+# If no valid file is found, it falls back to ../data/sample.mzML
 
 # Temp path to .mzML file (will prefer a file in the Data/ folder if present)
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -52,6 +63,31 @@ else:
 
 
 def parse_mzml(mzml_path):
+
+    """
+    Parses an .mzML file and extracts spectra metadata.
+
+    Parameters
+    ----------
+    mzml_path : str
+        Absolute or relative path to the .mzML file.
+
+    Returns
+    -------
+    list[dict]
+        A list of dictionaries containing:
+            - id: spectrum identifier
+            - ms_level: cvParam dictionary for MS level
+            - base_peak_mz: cvParam dictionary for base peak m/z
+            - base_peak_intensity: cvParam dictionary for base peak intensity
+
+    Raises
+    ------
+    FileNotFoundError
+        If the input file does not exist.
+    """
+
+    # Ensure the file exists before parsing
     if not os.path.exists(mzml_path):
         raise FileNotFoundError(f"mzML file not found: {mzml_path}")
     
@@ -106,6 +142,14 @@ def parse_mzml(mzml_path):
 
     return spectra_data
 
+# -------------------------------------------------------------------
+# Main Execution
+# -------------------------------------------------------------------
+# When executed directly (not imported), the script:
+#   1. Parses the input mzML file
+#   2. Extracts ms-level=1 spectra
+#   3. Saves results to a JSON file next to the original data file
+# -------------------------------------------------------------------
 
 if __name__ == "__main__":
     try:
