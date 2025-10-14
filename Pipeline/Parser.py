@@ -28,6 +28,7 @@ import xml.etree.ElementTree as ET
 import json
 import os
 import sys
+from decimal import Decimal
 
 # -------------------------------------------------------------------
 # File Path Setup
@@ -133,11 +134,30 @@ def parse_mzml(mzml_path):
 
         # Only keep spectra where ms level == "1"
         if ms_level == "1":
+            # Convert numeric-looking values from scientific notation into plain decimal strings
+            def fmt_num_str(s):
+                if s is None:
+                    return None
+                try:
+                    # Decimal preserves exact value and we can format without exponent
+                    d = Decimal(str(s))
+                    # normalize to remove exponent, then quantize to remove trailing exponent
+                    # but avoid losing precision by using plain str(d.normalize()) when possible
+                    # We'll convert to a plain string with no exponent by using 'f' formatting
+                    # with enough precision. Use as_tuple to estimate digits.
+                    tup = d.as_tuple()
+                    digits = len(tup.digits)
+                    # choose a precision large enough to hold all digits
+                    plain = format(d, 'f')
+                    return plain
+                except Exception:
+                    return s
+
             spectra_data.append({
                 "id": spec_id,
                 "ms_level": ms_level,
-                "base_peak_mz": base_peak_mz,
-                "base_peak_intensity": base_peak_intensity,
+                "base_peak_mz": fmt_num_str(base_peak_mz),
+                "base_peak_intensity": fmt_num_str(base_peak_intensity),
             })
 
     return spectra_data
