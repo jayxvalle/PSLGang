@@ -1,11 +1,14 @@
 import json
 import matplotlib.pyplot as plt
-# import numpy as np
+import numpy as np
+
+# create a baby parser to read the Json 
+
 
 # may need to connect to current parser
 #parse and read the json file
-with open("sample.json","r") as f :
-    graphData =json.load(f)
+with open("CVBS_1_Dis_neg_1.json","r") as f :
+    graphData = json.load(f)
     
 # a function that should help calculate if multiple files are used
 
@@ -15,14 +18,14 @@ with open("sample.json","r") as f :
     # kmd(lst)
     # print(lst)
 
+x = [float(entry["base_peak_mz"]) for entry in graphData]
+y = [float(entry["base_peak_intensity"]) for entry in graphData]
 
-
-
-
+plt.xlim(150,800)
 #need to use this to generate the calculations for x and y values 
 
-pit.xlabel('Ion Mass')
-pit.ylabel('Kendrick Mass Defect')
+plt.xlabel('Ion Mass')
+plt.ylabel('Kendrick Mass Defect')
 
 #should I graph all points from 1 file per graph... 
 # Marker size 200 for x axis --  s 
@@ -31,14 +34,10 @@ pit.ylabel('Kendrick Mass Defect')
 
 # this may need to be an array
 # this may be from the function for calculation 
-x = []
-y = []
 
 
-plt.sctter(x,y)
 
-#may need to change the title top the specific file name#
-plt.title('json name') 
-plt.legend() # this may not be needed
-
-pit.show()
+plt.scatter(x,y)
+plt.title('KMD Signal to Noise Dertermination Plot') 
+#plt.legend() # this may not be needed
+plt.show()
