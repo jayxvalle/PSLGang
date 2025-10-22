@@ -1,43 +1,74 @@
 import json
 import matplotlib.pyplot as plt
 import numpy as np
+import csv
+import os
 
-# create a baby parser to read the Json 
+# Constants
+CH2_EXACT_MASS = 14.01565
+CH2_NOMINAL_MASS = 14
 
+# Locate JSON
+script_dir = os.path.dirname(os.path.abspath(__file__))
+file_path = os.path.join(script_dir, "CVBS_1_Dis_neg_1.json")
 
-# may need to connect to current parser
-#parse and read the json file
-with open("CVBS_1_Dis_neg_1.json","r") as f :
-    graphData = json.load(f)
-    
-# a function that should help calculate if multiple files are used
+# Load JSON file
+with open(file_path, "r") as f:
+    data = json.load(f)
 
-#def kmdCalc(rV, v):
-    # x = []
-    # kmd = mass * (rV / v)
-    # kmd(lst)
-    # print(lst)
+print("Number of entries in JSON:", len(data))
+print("First 3 entries:", data[:3])
 
-x = [float(entry["base_peak_mz"]) for entry in graphData]
-y = [float(entry["base_peak_intensity"]) for entry in graphData]
+# Debug: Count how many entries have numeric base peak values
+numeric_base_peak_count = sum(
+    1 for entry in data 
+    if "base_peak_mz" in entry and entry["base_peak_mz"].replace('.', '', 1).isdigit()
+)
+print("Number of entries with numeric-like base_peak_mz:", numeric_base_peak_count)
+# Prepare lists
+mz_values, kmd_values, intensities = [], [], []
 
-plt.xlim(150,800)
-#need to use this to generate the calculations for x and y values 
+# Each entry = one scan point
+for entry in data:
+    mz = float(entry["base_peak_mz"])
+    intensity = float(entry["base_peak_intensity"])
 
-plt.xlabel('Ion Mass')
-plt.ylabel('Kendrick Mass Defect')
+    kendrick_mass = mz * (CH2_NOMINAL_MASS / CH2_EXACT_MASS)
+    kmd = round(mz) - kendrick_mass
 
-#should I graph all points from 1 file per graph... 
-# Marker size 200 for x axis --  s 
-# marker size is 0.5 for y axis -- s
-#cmap is color mapping numeric to colors
+    mz_values.append(mz)
+    kmd_values.append(kmd)
+    intensities.append(intensity)
 
-# this may need to be an array
-# this may be from the function for calculation 
+# Convert to numpy arrays for faster math
+mz_values = np.array(mz_values)
+kmd_values = np.array(kmd_values)
+intensities = np.array(intensities)
 
+# Apply log transform for visualization
+log_intensity = np.log(np.maximum(intensities, 1))
 
-
-plt.scatter(x,y)
-plt.title('KMD Signal to Noise Dertermination Plot') 
-#plt.legend() # this may not be needed
+# Plot
+plt.figure(figsize=(9, 6), dpi=100)
+sc = plt.scatter(mz_values, kmd_values, c=log_intensity, s=15, alpha=0.7, cmap="jet")
+plt.grid(True, linestyle="--", linewidth=0.3, alpha=0.5)
+plt.xlabel("Ion Mass (m/z)")
+plt.ylabel("Kendrick Mass Defect (KMD)")
+plt.title("KMD Signal-to-Noise Determination Heatmap")
+cb = plt.colorbar(sc)
+cb.set_label("ln(Intensity)")
+plt.xlim(np.min(mz_values), np.max(mz_values))
+plt.ylim(np.min(kmd_values), np.max(kmd_values))
+plt.tight_layout()
 plt.show()
+
+# Export CSV
+def export_to_csv(output_path):
+    with open(output_path, mode="w", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(["scan", "mz", "kmd", "intensity"])
+        for i, (mz, kmd, intensity) in enumerate(zip(mz_values, kmd_values, intensities), start=1):
+            writer.writerow([i, mz, kmd, intensity])
+    print(f"✅ Exported {len(mz_values)} points to {output_path}")
+
+# export_to_csv(os.path.join(script_dir, "kmd_results.csv"))
