@@ -96,7 +96,12 @@ def plot_data(data: List[dict], method: str = "fractional") -> None:
     log_c = np.log(np.maximum(c, 1.0))
 
     plt.figure(figsize=(10, 6))
-    scatter = plt.scatter(x, y, c=log_c, cmap="viridis", s=12, alpha=0.7)
+    
+    # Added a temporary random jitter to x and y to help see stacked points
+    x_jittered = x + np.random.normal(0, 2, size=len(x))
+    y_jittered = y + np.random.normal(0, 2, size=len(y))
+    scatter = plt.scatter(x_jittered, y_jittered, c=log_c, cmap="viridis", s=3, alpha=0.7)
+
     plt.xlabel("Ion Mass (m/z)")
     plt.ylabel("Kendrick Mass Defect ({})".format(method))
     plt.title("Kendrick Mass Defect plot")

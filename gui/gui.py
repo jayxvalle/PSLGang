@@ -9,7 +9,9 @@ from PyQt5.QtWidgets import (
 )
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-
+import subprocess
+import json
+import os
 
 class App(QMainWindow):
     def __init__(self):
@@ -47,7 +49,6 @@ class UploadPage(QWidget):
     def __init__(self, controller):
         super().__init__()
         self.controller = controller
-
         layout = QVBoxLayout(self)
         layout.setContentsMargins(40, 40, 40, 40)
 
@@ -55,19 +56,53 @@ class UploadPage(QWidget):
         title.setStyleSheet("font-size: 20px; font-weight: bold;")
         layout.addWidget(title)
 
-        upload_button = QPushButton("Select CSV")
+        upload_button = QPushButton("Select mzML")
         upload_button.clicked.connect(self.load_file)
         layout.addWidget(upload_button)
 
         layout.addStretch()
 
     def load_file(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Select Data File", "", "CSV Files (*.csv)")
-        if path:
-            self.controller.shared_data["file_path"] = path
-            df = pd.read_csv(path)
+        path, _ = QFileDialog.getOpenFileName(self, "Select Data File", "", "mzML Files (*.mzML)")
+        if not path:
+            return
+        
+        # Stores the selected .mzML file path for later use
+        self.controller.shared_data["file_path"] = path
+
+        # Defines the Parser.py script location
+        parser_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Pipeline", "Parser.py")
+
+        # Tells where Parser.py will create the JSON file
+        output_json = os.path.splitext(path)[0] + ".json"
+
+        # Log for which file is being parsed
+        print(f"Parsing file with parser.py: {path}")
+
+        # Run parser.py with the mzML path
+        try:
+            subprocess.run(
+                ["python3", parser_script, path],
+                check=True
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"Error running parser.py: {e}") # Error log if Parser.py fails to run
+            return
+
+        # Loads the generated JSON
+        if os.path.exists(output_json):
+            with open(output_json, "r") as f:
+                data = json.load(f)
+
+            # Convert JSON to DataFrame for easier plotting/analysis
+            df = pd.DataFrame(data)
             self.controller.shared_data["dataframe"] = df
+            print(f"Parsed and loaded {len(df)} rows from JSON") # Log for how many rows were loaded from JSON
+
+            # Go to next page
             self.controller.show_page(self.controller.config_page)
+        else:
+            print("'parser.py' did not create a JSON file.") # Error log if Parser.py did not generate a JSON
 
 
 # Step 2: Config Page
@@ -75,7 +110,6 @@ class ConfigPage(QWidget):
     def __init__(self, controller):
         super().__init__()
         self.controller = controller
-
         layout = QVBoxLayout(self)
         layout.setContentsMargins(40, 40, 40, 40)
 
@@ -94,13 +128,37 @@ class ConfigPage(QWidget):
         continue_btn.clicked.connect(self.next_step)
         layout.addWidget(continue_btn)
 
+        button_layout = QHBoxLayout()
+        back_btn = QPushButton("← Back")
+        back_btn.clicked.connect(lambda: self.controller.show_page(self.controller.upload_page))
+        button_layout.addWidget(back_btn)
+        layout.addLayout(button_layout)
+
         layout.addStretch()
 
     def next_step(self):
+        # Store chemical selection
         self.controller.shared_data["chemical"] = self.chemical_box.currentText()
-        self.controller.graph_page.update_graph()
-        self.controller.show_page(self.controller.graph_page)
 
+        # Get paths
+        mzml_path = self.controller.shared_data.get("file_path")
+        json_path = os.path.splitext(mzml_path)[0] + ".json"
+
+        # Path to Graph.py
+        graph_script = os.path.join(os.path.dirname(__file__), "../Pipeline/Graph.py")
+        graph_script = os.path.abspath(graph_script)
+
+        print(f"Running Graph.py using {json_path}")
+
+        try:
+            subprocess.run(
+                ["python3", graph_script, json_path, "--method", "round"],
+                check=True
+            )
+            print("Graph.py executed successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error running Graph.py: {e}")
+            return
 
 # Step 3: Graph Page
 class GraphPage(QWidget):
