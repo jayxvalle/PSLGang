@@ -70,8 +70,8 @@ class UploadPage(QWidget):
         # Stores the selected .mzML file path for later use
         self.controller.shared_data["file_path"] = path
 
-        # Defines the Parser.py script location
-        parser_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Pipeline", "Parser.py")
+        # Defines the Parser.py script location (absolute)
+        parser_script = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Pipeline", "Parser.py"))
 
         # Tells where Parser.py will create the JSON file
         output_json = os.path.splitext(path)[0] + ".json"
@@ -79,19 +79,29 @@ class UploadPage(QWidget):
         # Log for which file is being parsed
         print(f"Parsing file with parser.py: {path}")
 
-        # Run parser.py with the mzML path
+        if not os.path.exists(parser_script):
+            print(f"Parser script not found: {parser_script}")
+            return
+
+        # Run parser.py with the mzML path using the same Python executable
         try:
-            subprocess.run(
-                ["python3", parser_script, path],
-                check=True
-            )
+            completed = subprocess.run([sys.executable, parser_script, path], check=True, capture_output=True, text=True)
+            if completed.stdout:
+                print("parser.py stdout:", completed.stdout)
+            if completed.stderr:
+                print("parser.py stderr:", completed.stderr)
         except subprocess.CalledProcessError as e:
-            print(f"Error running parser.py: {e}") # Error log if Parser.py fails to run
+            print(f"Error running parser.py: {e}")
+            print("stdout:", getattr(e, "stdout", None))
+            print("stderr:", getattr(e, "stderr", None))
+            return
+        except FileNotFoundError as e:
+            print(f"Failed to run parser: {e}")
             return
 
         # Loads the generated JSON
         if os.path.exists(output_json):
-            with open(output_json, "r") as f:
+            with open(output_json, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
             # Convert JSON to DataFrame for easier plotting/analysis
@@ -144,21 +154,26 @@ class ConfigPage(QWidget):
         mzml_path = self.controller.shared_data.get("file_path")
         json_path = os.path.splitext(mzml_path)[0] + ".json"
 
-        # Path to Graph.py
-        graph_script = os.path.join(os.path.dirname(__file__), "../Pipeline/Graph.py")
-        graph_script = os.path.abspath(graph_script)
+        # Path to Graph.py (absolute)
+        graph_script = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Pipeline", "Graph.py"))
 
         print(f"Running Graph.py using {json_path}")
 
-        try:
-            subprocess.run(
-                ["python3", graph_script, json_path, "--method", "round"],
-                check=True
-            )
-            print("Graph.py executed successfully.")
-        except subprocess.CalledProcessError as e:
-            print(f"Error running Graph.py: {e}")
-            return
+        if not os.path.exists(graph_script):
+            print(f"Graph script not found: {graph_script}")
+        else:
+            try:
+                completed = subprocess.run([sys.executable, graph_script, json_path, "--method", "round"], check=True, capture_output=True, text=True)
+                if completed.stdout:
+                    print("Graph.py stdout:", completed.stdout)
+                if completed.stderr:
+                    print("Graph.py stderr:", completed.stderr)
+                print("Graph.py executed successfully.")
+            except subprocess.CalledProcessError as e:
+                print(f"Error running Graph.py: {e}")
+                print("stdout:", getattr(e, "stdout", None))
+                print("stderr:", getattr(e, "stderr", None))
+                return
 
 # Step 3: Graph Page
 class GraphPage(QWidget):
