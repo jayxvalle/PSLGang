@@ -75,14 +75,19 @@ This project provides:
     python3 --version
     ```
 ### 2. Install Dependencies
+  - Installing pip requirements:
 * Windows:
   ```bash
-  pip install pyqt5 pandas numpy matplotlib
+  python -m pip install --user -r pip-requirements.txt
+  or
+  python -m pip install --user -r /path/to/pip-requirements.txt
   ```
   or download PyQt5 from https://pypi.org/project/PyQt5/.
 * MacOS:
   ```bash
-  pip3 install pyqt5 pandas numpy matplotlib
+  python3 -m pip install --user -r pip-requirements.txt
+  or
+  python3 -m pip install --user -r /path/to/pip-requirements.txt
   ```
   or download PyQt5 from https://pypi.org/project/PyQt5/.
 ### 3. Clone the Repository
