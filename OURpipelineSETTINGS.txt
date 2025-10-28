@@ -1,0 +1,108 @@
+# ============================
+# CAIL Pipeline Settings (TXT)
+# JSON → KMD → Plot (+ optional CSV)
+# ============================
+
+# ------------------------------------------------------------------
+# Input & File Resolution
+# ------------------------------------------------------------------
+Data file (primary):
+  <set at runtime via GUI>  # UploadPage selects .mzML
+Fallback search paths:
+  ../Data/CVBS_1_Dis_neg_1.mzML
+  ../data/sample.mzML
+
+# Parser behavior (Parser.py)
+Parse only MS level: 1
+ID format normalization: Extract "scan=<n>" when present
+Numeric formatting: Decimal → plain string (no exponents)
+Namespace handling: Auto-detect mzML default namespace
+Output JSON location: Same folder as input, <basename>.json
+On missing input: hard fail
+
+# ------------------------------------------------------------------
+# KMD/Graph computation (Graph.py functionality)
+# ------------------------------------------------------------------
+Repeat unit:
+  Chemical: CH2
+  Exact mass: 14.01565
+  Nominal mass: 14.0
+Kendrick mass variants:
+  fractional: KM − floor(KM)
+  round: round(KM) − KM
+Default plot method: round
+Augment JSON with KMD fields: disabled by default (enable with --augment)
+Fields added when augmenting:
+  kendrick_mass
+  kendrick_mass_defect_fraction
+  kendrick_mass_defect_round
+
+# ------------------------------------------------------------------
+# Plotting
+# ------------------------------------------------------------------
+Axes:
+  X: Ion mass (m/z)
+  Y: KMD (fractional | round)
+Color scale: ln(intensity) using base_peak_intensity (≤0 clamped to 1)
+Point size / alpha: s=3, α=0.7
+Jitter (visual de-stack): Normal(0, σx=2) on m/z, Normal(0, σy=2) on KMD
+Grid: dashed, 0.3 width, 0.5 alpha
+Figure size: 10×6 inches
+Colormap: viridis
+Tight layout: true
+No data behavior: log + exit
+
+# ------------------------------------------------------------------
+# CSV Export (optional)
+# ------------------------------------------------------------------
+CSV columns (in order):
+  id, mz, kendrick_mass, kmd_fraction, kmd_round, intensity
+mz source preference: base_peak_mz else mz
+Intensity source: base_peak_intensity
+Destination: path passed via --csv (no default)
+
+# ------------------------------------------------------------------
+# CLI Defaults (Graph.py)
+# ------------------------------------------------------------------
+Default JSON if none provided:
+  <repo_dir>/CVBS_1_Dis_neg_1.json
+Flags:
+  --augment  # overwrites JSON after backing up .bak
+  --method fractional|round  # default round
+  --csv <path>  # write CSV
+Exit codes:
+  1 on missing JSON
+  0 on success
+
+# ------------------------------------------------------------------
+# GUI app (PyQt)
+# ------------------------------------------------------------------
+Step 1 (Upload):
+  User selects .mzML
+  App runs: python ../Pipeline/Parser.py <file.mzML>
+  Expects: <file>.json in same folder
+  Loads DataFrame from JSON
+Step 2 (Config):
+  User selects chemical (UI only; current Graph.py uses CH2 constants)
+  App runs: python ../Pipeline/Graph.py <file>.json --method round
+Step 3 (Graphs):
+  Matplotlib canvas shows series per DataFrame columns (internal plot)
+  Buttons:
+    Save Graph → output_graph.png in CWD
+    Export CSV → exported_data.csv in CWD
+    Toggle Noise Lines → UI flag only (no effect on Graph.py)
+
+# ------------------------------------------------------------------
+# Logging & Counters
+# ------------------------------------------------------------------
+Parser counts:
+  prints "Counts by ms_level:" summary
+GUI stdout:
+  prints parser and graph subprocess stdout/stderr if present
+
+# ------------------------------------------------------------------
+# Interop with prior pipeline (reference only)
+# ------------------------------------------------------------------
+The older MZmine→features→SIRIUS path is unchanged and separate.
+Use MZmine to export feature CSV/MGF when needed for MFAssignR/SIRIUS.
+(Original settings file retained for that workflow.)
