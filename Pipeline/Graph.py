@@ -44,73 +44,95 @@ def load_json(path: str) -> List[dict]:
         return json.load(f)
 
 
-def augment_and_compute(data: List[dict], augment: bool = False) -> List[dict]:
-    counts_by_ms = {}
-    for rec in data:
-        ms_level = rec.get("ms_level")
-        counts_by_ms[ms_level] = counts_by_ms.get(ms_level, 0) + 1
+def augment_and_compute(data: list) -> list:
+    """
+    Compute Kendrick mass defect for all MS1 spectra using full arrays if available.
+    """
+    filtered = [rec for rec in data if rec.get("ms_level") == "1"]
 
-        mz = safe_float(rec.get("base_peak_mz") or rec.get("mz"))
-        intensity = safe_float(rec.get("base_peak_intensity"))
-        if mz is None:
-            rec["kendrick_mass"] = None
-            rec["kendrick_mass_defect_fraction"] = None
-            rec["kendrick_mass_defect_round"] = None
-            continue
+    for rec in filtered:
+        mz_array = rec.get("m_z_array")
+        intensity_array = rec.get("intensity_array")
 
-        km = kendrick_mass(mz)
-        rec["kendrick_mass"] = km
-        rec["kendrick_mass_defect_fraction"] = kmd_fractional(mz)
-        rec["kendrick_mass_defect_round"] = kmd_round(mz)
-
-    print("Counts by ms_level:")
-    for k, v in counts_by_ms.items():
-        print(f"  ms_level={k}: {v} records")
-
-    return data
-
-
-def plot_data(data: List[dict], method: str = "fractional") -> None:
-    x = []
-    y = []
-    c = []
-    for rec in data:
-        mz = safe_float(rec.get("base_peak_mz") or rec.get("mz"))
-        if mz is None:
-            continue
-        x.append(mz)
-        if method == "fractional":
-            y.append(rec.get("kendrick_mass_defect_fraction"))
+        if mz_array and intensity_array:
+            # Compute Kendrick mass and defects for every point
+            rec["kendrick_mz"] = [kendrick_mass(mz) for mz in mz_array]
+            rec["kendrick_fraction"] = [kmd_fractional(mz) for mz in mz_array]
+            rec["kendrick_round"] = [kmd_round(mz) for mz in mz_array]
         else:
-            y.append(rec.get("kendrick_mass_defect_round"))
-        c.append(safe_float(rec.get("base_peak_intensity")) or 0.0)
+            # fallback to base peak if arrays are missing
+            mz = safe_float(rec.get("base_peak_mz"))
+            rec["kendrick_mz"] = [kendrick_mass(mz)] if mz else []
+            rec["kendrick_fraction"] = [kmd_fractional(mz)] if mz else []
+            rec["kendrick_round"] = [kmd_round(mz)] if mz else []
+
+    print(f"Filtered {len(filtered)} MS1 spectra for plotting")
+    return filtered
+
+
+def plot_data(data: list, method: str = "round",
+              lower_y: float = 0.05, upper_y: float = 0.2,
+              lower_x: Optional[float] = None, upper_x: Optional[float] = None,
+              max_points: Optional[int] = 50000) -> dict:
+
+    x, y, c = [], [], []
+
+    # flatten all scans
+    for rec in data:
+        mz_array = rec.get("m_z_array")
+        intensity_array = rec.get("intensity_array")
+        if mz_array and intensity_array:
+            y_vals = rec["kendrick_fraction"] if method == "fractional" else rec["kendrick_round"]
+            x.extend(mz_array)
+            y.extend(y_vals)
+            c.extend(intensity_array)
 
     if not x:
         print("No data to plot.")
-        return
+        return {"Noise": None, "Figure": None}
 
     x = np.array(x)
     y = np.array(y)
     c = np.array(c)
-
     log_c = np.log(np.maximum(c, 1.0))
 
-    plt.figure(figsize=(10, 6))
+    # Set x limits if not given
+    lower_x = np.min(x) if lower_x is None else lower_x
+    upper_x = np.max(x) if upper_x is None else upper_x
+
+    # Computed noise region (it's computed, just not drawn) -- line 120-126
+    noise_mask = (y > 0.0011232*x + lower_y) & (y < 0.0011232*x + upper_y) & (x >= lower_x) & (x <= upper_x)
+    noise_values = log_c[noise_mask]
+    noise_level = float(np.exp(np.mean(noise_values))) if len(noise_values) > 0 else None
+
+    # Optionally downsample points for plotting
+    if max_points and len(x) > max_points:
+        idx = np.random.choice(len(x), max_points, replace=False)
+        x_plot, y_plot, c_plot = x[idx], y[idx], log_c[idx]
+    else:
+        x_plot, y_plot, c_plot = x, y, log_c
+
+    # Plotting
+    fig, ax = plt.subplots(figsize=(10, 8))
+    scatter = plt.scatter(x_plot, y_plot, c=c_plot, cmap="viridis", s=3, alpha=0.7)
+    plt.colorbar(scatter, label="ln(intensity)")
     
-    # Added a temporary random jitter to x and y to help see stacked points
-    x_jittered = x + np.random.normal(0, 2, size=len(x))
-    y_jittered = y + np.random.normal(0, 2, size=len(y))
-    scatter = plt.scatter(x_jittered, y_jittered, c=log_c, cmap="viridis", s=3, alpha=0.7)
+    # # Noise region lines
+    # ax.plot([lower_x, upper_x], [0.0011232*lower_x + lower_y, 0.0011232*upper_x + lower_y],
+    #         color='red', lw=1)
+    # ax.plot([lower_x, upper_x], [0.0011232*lower_x + upper_y, 0.0011232*upper_x + upper_y],
+    #         color='red', lw=1)
+    # ax.axvline(lower_x, color='red', lw=1)
+    # ax.axvline(upper_x, color='red', lw=1)
 
     plt.xlabel("Ion Mass (m/z)")
-    plt.ylabel("Kendrick Mass Defect ({})".format(method))
-    plt.title("Kendrick Mass Defect plot")
-    cb = plt.colorbar(scatter)
-    cb.set_label("ln(intensity)")
+    plt.ylabel(f"Kendrick Mass Defect ({method})")
+    plt.title("KMD Signal to Noise Determination Plot (MS1 spectra)")
     plt.grid(True, linestyle="--", linewidth=0.3, alpha=0.5)
     plt.tight_layout()
     plt.show()
 
+    # return {"Noise": noise_level, "Figure": fig}
 
 def export_to_csv(data: List[dict], outpath: str) -> None:
     with open(outpath, "w", newline="", encoding="utf-8") as csvfile:
@@ -142,7 +164,7 @@ def main():
         raise SystemExit(1)
 
     data = load_json(args.json_path)
-    data = augment_and_compute(data, augment=args.augment)
+    data = augment_and_compute(data)
 
     if args.augment:
         # write augmented JSON (backup original)
