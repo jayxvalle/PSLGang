@@ -17,6 +17,15 @@ class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("CAIL Mass Spectrometry Analysis")
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #800000;
+            }
+            QPushButton {
+                background-color: #FFFFFF;
+                color: black;
+            }
+                        """)
         self.resize(900, 650)
 
         # Shared global state
@@ -53,7 +62,7 @@ class UploadPage(QWidget):
         layout.setContentsMargins(40, 40, 40, 40)
 
         title = QLabel("Step 1: Upload Data File")
-        title.setStyleSheet("font-size: 20px; font-weight: bold;")
+        title.setStyleSheet("text-align: center; font-size: 20px; font-weight: bold;")
         layout.addWidget(title)
 
         upload_button = QPushButton("Select mzML")
@@ -71,7 +80,7 @@ class UploadPage(QWidget):
         self.controller.shared_data["file_path"] = path
 
         # Defines the Parser.py script location (absolute)
-        parser_script = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Pipeline", "Parser.py"))
+        parser_script = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Pipeline", "parser2.py"))
 
         # Tells where Parser.py will create the JSON file
         output_json = os.path.splitext(path)[0] + ".json"
@@ -86,17 +95,8 @@ class UploadPage(QWidget):
         # Run parser.py with the mzML path using the same Python executable
         try:
             completed = subprocess.run([sys.executable, parser_script, path], check=True, capture_output=True, text=True)
-            if completed.stdout:
-                print("parser.py stdout:", completed.stdout)
-            if completed.stderr:
-                print("parser.py stderr:", completed.stderr)
         except subprocess.CalledProcessError as e:
             print(f"Error running parser.py: {e}")
-            print("stdout:", getattr(e, "stdout", None))
-            print("stderr:", getattr(e, "stderr", None))
-            return
-        except FileNotFoundError as e:
-            print(f"Failed to run parser: {e}")
             return
 
         # Loads the generated JSON
@@ -104,15 +104,16 @@ class UploadPage(QWidget):
             with open(output_json, "r", encoding="utf-8") as f:
                 data = json.load(f)
 
-            # Convert JSON to DataFrame for easier plotting/analysis
-            df = pd.DataFrame(data)
-            self.controller.shared_data["dataframe"] = df
-            print(f"Parsed and loaded {len(df)} rows from JSON") # Log for how many rows were loaded from JSON
+            # ✅ store raw spectra data (arrays included)
+            self.controller.shared_data["spectra_data"] = data  
+            if not data:
+                print("No spectra loaded from JSON.")
+                return
 
-            # Go to next page
+            print(f"Parsed and loaded {len(data)} spectra from JSON")
             self.controller.show_page(self.controller.config_page)
         else:
-            print("'parser.py' did not create a JSON file.") # Error log if Parser.py did not generate a JSON
+            print("'parser.py' did not create a JSON file.")
 
 
 # Step 2: Config Page
