@@ -12,6 +12,7 @@ from matplotlib.figure import Figure
 import subprocess
 import json
 import os
+from Pipeline import parser2, Graph
 
 class App(QMainWindow):
     def __init__(self):
@@ -92,17 +93,26 @@ class UploadPage(QWidget):
             print(f"Parser script not found: {parser_script}")
             return
 
-        # Run parser.py with the mzML path using the same Python executable
-        try:
-            completed = subprocess.run([sys.executable, parser_script, path], check=True, capture_output=True, text=True)
-        except subprocess.CalledProcessError as e:
-            print(f"Error running parser.py: {e}")
-            return
+        # # Run parser.py with the mzML path using the same Python executable
+        # try:
+        #     completed = subprocess.run([sys.executable, parser_script, path], check=True, capture_output=True, text=True)
+        # except subprocess.CalledProcessError as e:
+        #     print(f"Error running parser.py: {e}")
+        #     return
 
-        # Loads the generated JSON
-        if os.path.exists(output_json):
-            with open(output_json, "r", encoding="utf-8") as f:
-                data = json.load(f)
+        # # Loads the generated JSON
+        # if os.path.exists(output_json):
+        #     with open(output_json, "r", encoding="utf-8") as f:
+        #         data = json.load(f)
+
+        try:
+             # Directly call the parser function instead of running a subprocess
+            data = parser2.parse_mzml_full_spectra(path)
+            self.controller.shared_data["spectra_data"] = data
+            print(f"✅ Parsed {len(data)} MS1 spectra directly from {os.path.basename(path)}")
+            self.controller.show_page(self.controller.config_page)
+        except Exception as e:
+            print(f"Error parsing mzML file: {e}")
 
             # ✅ store raw spectra data (arrays included)
             self.controller.shared_data["spectra_data"] = data  
@@ -158,23 +168,41 @@ class ConfigPage(QWidget):
         # Path to Graph.py (absolute)
         graph_script = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Pipeline", "Graph.py"))
 
-        print(f"Running Graph.py using {json_path}")
+        # print(f"Running Graph.py using {json_path}")
 
-        if not os.path.exists(graph_script):
-            print(f"Graph script not found: {graph_script}")
-        else:
-            try:
-                completed = subprocess.run([sys.executable, graph_script, json_path, "--method", "round"], check=True, capture_output=True, text=True)
-                if completed.stdout:
-                    print("Graph.py stdout:", completed.stdout)
-                if completed.stderr:
-                    print("Graph.py stderr:", completed.stderr)
-                print("Graph.py executed successfully.")
-            except subprocess.CalledProcessError as e:
-                print(f"Error running Graph.py: {e}")
-                print("stdout:", getattr(e, "stdout", None))
-                print("stderr:", getattr(e, "stderr", None))
+        # if not os.path.exists(graph_script):
+        #     print(f"Graph script not found: {graph_script}")
+        # else:
+        #     try:
+        #         completed = subprocess.run([sys.executable, graph_script, json_path, "--method", "round"], check=True, capture_output=True, text=True)
+        #         if completed.stdout:
+        #             print("Graph.py stdout:", completed.stdout)
+        #         if completed.stderr:
+        #             print("Graph.py stderr:", completed.stderr)
+        #         print("Graph.py executed successfully.")
+        #     except subprocess.CalledProcessError as e:
+        #         print(f"Error running Graph.py: {e}")
+        #         print("stdout:", getattr(e, "stdout", None))
+        #         print("stderr:", getattr(e, "stderr", None))
+        #         return
+
+        print(f"Running Graph analysis directly on parsed data…")
+
+        try:
+            data = self.controller.shared_data.get("spectra_data", [])
+            if not data:
+                print("No spectra data loaded.")
                 return
+
+            # Compute Kendrick mass defect and plot
+            processed = Graph.augment_and_compute(data)
+            results = Graph.plot_data(processed, method="round")
+
+            print(f"✅ Graph plotted successfully. Noise Level: {results['Noise']}")
+            self.controller.show_page(self.controller.graph_page)
+
+        except Exception as e:
+            print(f"Error computing/plotting graph: {e}")
 
 # Step 3: Graph Page
 class GraphPage(QWidget):
