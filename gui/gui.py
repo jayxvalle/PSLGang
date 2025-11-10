@@ -194,12 +194,22 @@ class ConfigPage(QWidget):
                 print("No spectra data loaded.")
                 return
 
-            # Compute Kendrick mass defect and plot
+            # # Compute Kendrick mass defect and plot
+            # processed = Graph.augment_and_compute(data)
+            # results = Graph.plot_data(processed, method="round")
+
+            # print(f"✅ Graph plotted successfully. Noise Level: {results['Noise']}")
+            # self.controller.show_page(self.controller.graph_page)
+
             processed = Graph.augment_and_compute(data)
             results = Graph.plot_data(processed, method="round")
 
-            print(f"✅ Graph plotted successfully. Noise Level: {results['Noise']}")
-            self.controller.show_page(self.controller.graph_page)
+            print(f"✅ Graph computed successfully. Noise Level: {results['Noise']}")
+
+            # Pass the Matplotlib figure to the GraphPage
+            graph_page = self.controller.graph_page
+            graph_page.display_figure(results["Figure"])
+            self.controller.show_page(graph_page)
 
         except Exception as e:
             print(f"Error computing/plotting graph: {e}")
@@ -244,6 +254,19 @@ class GraphPage(QWidget):
         back_btn.clicked.connect(lambda: self.controller.show_page(self.controller.config_page))
         button_layout.addWidget(back_btn)
 
+    def display_figure(self, fig):
+        """Replace the current canvas with a new Matplotlib figure."""
+        # Remove the old canvas
+        self.layout().removeWidget(self.canvas)
+        self.canvas.setParent(None)
+
+        # Set the new figure and canvas
+        self.figure = fig
+        self.ax = fig.axes[0] if fig.axes else fig.add_subplot(111)
+        self.canvas = FigureCanvas(fig)
+        self.layout().insertWidget(1, self.canvas)  # below title, above buttons
+        self.canvas.draw()
+
     def update_graph(self):
         df = self.controller.shared_data.get("dataframe")
         chemical = self.controller.shared_data.get("chemical")
@@ -261,11 +284,18 @@ class GraphPage(QWidget):
         print("✅ Graph saved as output_graph.png")
 
     def export_csv(self):
-        df = self.controller.shared_data.get("dataframe")
-        if df is not None:
-            df.to_csv("exported_data.csv", index=False)
-            print("✅ CSV exported as exported_data.csv")
+        try:
+            data = self.controller.shared_data.get("spectra_data")
+            if not data:
+                print("No data to export.")
+                return
 
+            outpath = os.path.join(os.getcwd(), "exported_data.csv")
+            Graph.export_to_csv(data, outpath)
+            print(f"✅ CSV exported to {outpath}")
+        except Exception as e:
+            print(f"Error exporting CSV: {e}")
+            
     def toggle_noise(self):
         self.noise_enabled = not self.noise_enabled
         print(f"Noise {'enabled' if self.noise_enabled else 'disabled'}")

@@ -132,7 +132,7 @@ def plot_data(data: list, method: str = "round",
     ax.set_title("KMD Signal to Noise Determination Plot (MS1 spectra)")
     ax.grid(True, linestyle="--", linewidth=0.3, alpha=0.5)
     plt.tight_layout()
-    plt.show()
+    # plt.show()
 
     return {"Noise": noise_level, "Figure": fig}
 
