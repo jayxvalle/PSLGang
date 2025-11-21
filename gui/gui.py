@@ -72,58 +72,32 @@ class UploadPage(QWidget):
 
         layout.addStretch()
 
+        
     def load_file(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Select Data File", "", "mzML Files (*.mzML)")
+        # Ask user for an mzML file
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Select Data File", "", "mzML Files (*.mzML)"
+        )
         if not path:
             return
-        
-        # Stores the selected .mzML file path for later use
+
+        # Store the path globally
         self.controller.shared_data["file_path"] = path
-
-        # Defines the Parser.py script location (absolute)
-        parser_script = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Pipeline", "parser2.py"))
-
-        # Tells where Parser.py will create the JSON file
-        output_json = os.path.splitext(path)[0] + ".json"
-
-        # Log for which file is being parsed
-        print(f"Parsing file with parser.py: {path}")
-
-        if not os.path.exists(parser_script):
-            print(f"Parser script not found: {parser_script}")
-            return
-
-        # # Run parser.py with the mzML path using the same Python executable
-        # try:
-        #     completed = subprocess.run([sys.executable, parser_script, path], check=True, capture_output=True, text=True)
-        # except subprocess.CalledProcessError as e:
-        #     print(f"Error running parser.py: {e}")
-        #     return
-
-        # # Loads the generated JSON
-        # if os.path.exists(output_json):
-        #     with open(output_json, "r", encoding="utf-8") as f:
-        #         data = json.load(f)
+        print(f"Selected file: {path}")
 
         try:
-             # Directly call the parser function instead of running a subprocess
+            # Parse mzML directly (no subprocess, no file path lookups)
             data = parser2.parse_mzml_full_spectra(path)
             self.controller.shared_data["spectra_data"] = data
+
             print(f"✅ Parsed {len(data)} MS1 spectra directly from {os.path.basename(path)}")
+
+            # Advance to Step 2
             self.controller.show_page(self.controller.config_page)
+
         except Exception as e:
-            print(f"Error parsing mzML file: {e}")
-
-            # ✅ store raw spectra data (arrays included)
-            self.controller.shared_data["spectra_data"] = data  
-            if not data:
-                print("No spectra loaded from JSON.")
-                return
-
-            print(f"Parsed and loaded {len(data)} spectra from JSON")
-            self.controller.show_page(self.controller.config_page)
-        else:
-            print("'parser.py' did not create a JSON file.")
+            print(f"❌ Error parsing mzML file: {e}")
+            return
 
 
 # Step 2: Config Page
