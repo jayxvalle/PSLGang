@@ -20,14 +20,17 @@ class App(QMainWindow):
         self.setWindowTitle("CAIL Mass Spectrometry Analysis")
         self.setStyleSheet("""
             QMainWindow {
-                background-color: #800000;
+                background-color: #1E1E1E;
             }
             QPushButton {
                 background-color: #FFFFFF;
                 color: black;
-            }
+                padding: 8px 16px;
+                border-radius: 10px;   /* Rounded corners */
+}
+          
                         """)
-        self.resize(900, 650)
+        self.resize(1250, 775)
 
         # Shared global state
         self.shared_data = {"file_path": None, "chemical": None, "dataframe": None}
