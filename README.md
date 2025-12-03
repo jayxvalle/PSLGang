@@ -12,9 +12,9 @@
 This project provides:
 
 1. A **pipeline** for parsing `.mzML` files, extracting spectra with MS level = 1, and saving the relevant data as JSON.  
-2. A **GUI** for selecting files, choosing a chemical for analysis, and (in the future) graphing the results.
-3. (Future) - Graphing for visualization/calculation.
-4. (Future) - Implemention of API.
+2. A **GUI** for selecting files, choosing a chemical for analysis, and graphing the results.
+3. A **Graph** for visualization, calculation, and option for exporting as a CSV.
+4. (Future) - Implemention of CLI.
 
 ---
 
@@ -98,20 +98,12 @@ This project provides:
   ```
 ### 4. Run Program
 * Windows:
-  - To run Parser, open command line and run:
+  - To run the program, first find the directory where you've cloned the repository. Once inside PSLGang folder run:
     ```bash
-    python pipeline/parser.py path/to/CVBS_1_Dis_neg_1.mzML
-    ```
-  - To run 'gui' find the directory where you've cloned the repository. Once inside PSLGang folder, cd into 'gui' and run:
-    ```bash
-    python gui.py
+    python -m gui.gui
     ```
 * MacOs:
-  - To run Parser, open command line and run:
+  - To run the program, first find the directory where you've cloned the repository. Once inside PSLGang folder run:
     ```bash
-    python pipeline/parser.py path/to/CVBS_1_Dis_neg_1.mzML
-    ```
-  - To run 'gui' find the directory where you've cloned the repository. Once inside PSLGang folder, cd into 'gui' and run:
-    ```bash
-    python3 gui.py
+    python -m gui.gui
     ```
