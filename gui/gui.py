@@ -12,7 +12,7 @@ from matplotlib.figure import Figure
 import subprocess
 import json
 import os
-from Pipeline import parser2, Graph
+from Pipeline import Parser, Graph
 
 class App(QMainWindow):
     def __init__(self):
@@ -90,7 +90,7 @@ class UploadPage(QWidget):
 
         try:
             # Parse mzML directly (no subprocess, no file path lookups)
-            data = parser2.parse_mzml_full_spectra(path)
+            data = Parser.parse_mzml_full_spectra(path)
             self.controller.shared_data["spectra_data"] = data
 
             print(f"✅ Parsed {len(data)} MS1 spectra directly from {os.path.basename(path)}")
@@ -144,25 +144,6 @@ class ConfigPage(QWidget):
 
         # Path to Graph.py (absolute)
         graph_script = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "Pipeline", "Graph.py"))
-
-        # print(f"Running Graph.py using {json_path}")
-
-        # if not os.path.exists(graph_script):
-        #     print(f"Graph script not found: {graph_script}")
-        # else:
-        #     try:
-        #         completed = subprocess.run([sys.executable, graph_script, json_path, "--method", "round"], check=True, capture_output=True, text=True)
-        #         if completed.stdout:
-        #             print("Graph.py stdout:", completed.stdout)
-        #         if completed.stderr:
-        #             print("Graph.py stderr:", completed.stderr)
-        #         print("Graph.py executed successfully.")
-        #     except subprocess.CalledProcessError as e:
-        #         print(f"Error running Graph.py: {e}")
-        #         print("stdout:", getattr(e, "stdout", None))
-        #         print("stderr:", getattr(e, "stderr", None))
-        #         return
-
         print(f"Running Graph analysis directly on parsed data…")
 
         try:
@@ -170,13 +151,6 @@ class ConfigPage(QWidget):
             if not data:
                 print("No spectra data loaded.")
                 return
-
-            # # Compute Kendrick mass defect and plot
-            # processed = Graph.augment_and_compute(data)
-            # results = Graph.plot_data(processed, method="round")
-
-            # print(f"✅ Graph plotted successfully. Noise Level: {results['Noise']}")
-            # self.controller.show_page(self.controller.graph_page)
 
             processed = Graph.augment_and_compute(data)
             results = Graph.plot_data(processed, method="round")

@@ -25,12 +25,6 @@ default_paths = [
     os.path.join(repo_root, "data", "sample.mzML"),
 ]
 
-# if len(sys.argv) > 1:
-#     mzml_path = sys.argv[1]
-# else:
-#     mzml_path = next((p for p in default_paths if os.path.exists(p)), None)
-#     if mzml_path is None:
-#         raise SystemExit("No .mzML file specified or found in Data/ directory.")
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         mzml_path = sys.argv[1]
@@ -145,22 +139,3 @@ def parse_mzml_full_spectra(mzml_path):
         spectra_data.append(spectrum_info)
 
     return spectra_data
-
-
-# -------------------------------------------------------------------
-# Main execution
-# -------------------------------------------------------------------
-# if __name__ == "__main__":
-#     try:
-#         spectra = parse_mzml_full_spectra(mzml_path)
-#         base_name = os.path.splitext(os.path.basename(mzml_path))[0]
-#         output_path = os.path.join(os.path.dirname(mzml_path), f"{base_name}.json")
-
-#         with open(output_path, "w", encoding="utf-8") as f:
-#             json.dump(spectra, f, indent=2)
-
-#         print(f"Extracted {len(spectra)} MS1 spectra to {output_path}")
-#         print("→ Full m/z and intensity arrays included for plotting")
-#     except Exception as e:
-#         print(f"Error while parsing mzML: {e}")
-#         raise

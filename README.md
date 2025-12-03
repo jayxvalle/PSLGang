@@ -50,7 +50,7 @@ This project provides:
 - GUI for:
   - Selecting `.json` files  
   - Choosing a chemical for calculation  
-  - (Future) Graphing and calculations for chemical data  
+  - Graphing and calculations for chemical data (Currently only CH2 is working)
 
 ---
 
