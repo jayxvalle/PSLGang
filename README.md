@@ -107,3 +107,32 @@ This project provides:
     ```bash
     python -m gui.gui
     ```
+
+---
+
+## Application Preview
+
+Below is the typical workflow once the program is launched — from the initial interface, to selecting an `.mzML` file, choosing a chemical, and viewing the final plotted graph.
+
+---
+
+### 1. Main Interface
+Displayed immediately when the program starts.
+
+![Main GUI](images/main_gui.png)
+
+---
+
+### 2. File Selection
+The user is prompted to select a `.mzML` file for processing.
+
+![File Selection](images/file_selection.png)
+
+---
+
+### 3. Example Graph Output
+After selecting a chemical (currently CH2 for testing) and pressing **Continue**, the program generates a graph based on the extracted spectra.
+
+![Graph Example](images/graph_example.png)
+
+---
