@@ -25,14 +25,18 @@ This project provides:
 .
 ├── Data/
 │   └── CVBS_1_Dis_neg_1.json      # Example .mzML file converted to JSON
+├── gui/
+│   └── gui.py                     # GUI for selecting files and chemicals
+├── images/
+│   └── file_selection.png                     # Example Previews
+│   └── graph_example.png
+│   └── main_gui.png
 ├── Pipeline/
 │   ├── Graph.py                   # Functions for graphing chemical data (planned)
 │   └── Parser.py                  # Parses .mzML files and outputs JSON
-├── gui/
-│   └── gui.py                     # GUI for selecting files and chemicals
-├── TranslatedRscript.py           # Python translation of R’s KMDNoise function
-├── JSONplaceholderExample.py      # (Placeholder file, not used)
-└── README.md                      # This file
+├── pip-requirements.txt           # Dependencies used
+├── README.md                      # Project overview, installation, and usage instructions
+└── TranslatedRscript.py           # Python translation of R’s KMDNoise function
 ```
 
 
