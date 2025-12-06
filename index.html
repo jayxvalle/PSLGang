@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>mzML Parser & GUI Journey</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --accent: #22d3ee;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --card: #1e293b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(34,211,238,0.08), transparent 25%),
+                  radial-gradient(circle at 80% 0%, rgba(94,234,212,0.08), transparent 20%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(135deg, rgba(34,211,238,0.1), rgba(94,234,212,0.08));
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 48px 20px 32px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0 0 12px;
+      font-size: clamp(32px, 4vw, 46px);
+      letter-spacing: -0.02em;
+    }
+    header p {
+      margin: 0 auto;
+      max-width: 860px;
+      color: var(--muted);
+      font-size: 18px;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 32px 20px 72px; }
+    section { margin-bottom: 48px; }
+    h2 {
+      font-size: 24px;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h2 span.icon {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: rgba(34,211,238,0.14);
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 14px;
+      padding: 16px 18px;
+      height: 100%;
+    }
+    .card h3 { margin: 0 0 8px; font-size: 17px; }
+    .card p { margin: 0; color: var(--muted); }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      margin-top: 16px;
+    }
+    figure {
+      margin: 0;
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    figure img, figure svg { width: 100%; display: block; }
+    figure figcaption {
+      padding: 12px 14px 14px;
+      color: var(--muted);
+      font-size: 14px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .timeline {
+      position: relative;
+      padding-left: 16px;
+      border-left: 2px dashed rgba(255,255,255,0.08);
+      display: grid;
+      gap: 18px;
+    }
+    .timeline-step {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 14px 16px;
+      position: relative;
+    }
+    .timeline-step::before {
+      content: "";
+      position: absolute;
+      left: -18px;
+      top: 18px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(34,211,238,0.15);
+    }
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      margin-top: 40px;
+    }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Journey of the mzML Parser & GUI Pipeline</h1>
+    <p>From our first sketches to a working pipeline with an interactive GUI, this page captures the milestones that shaped the project and the visuals that guided each step.</p>
+  </header>
+
+  <main class="container">
+    <section class="panel">
+      <h2><span class="icon">01</span>What We Built</h2>
+      <div class="summary-grid">
+        <div class="card">
+          <h3>Parsing Pipeline</h3>
+          <p>Extracts MS level 1 spectra from <code>.mzML</code> files and structures the results into JSON for downstream analysis.</p>
+        </div>
+        <div class="card">
+          <h3>Interactive GUI</h3>
+          <p>Guides users through file selection, chemical targeting, and graph generation with a clean PyQt5 interface.</p>
+        </div>
+        <div class="card">
+          <h3>Visualization</h3>
+          <p>Provides quick plots of extracted spectra and offers export-ready views that document the experiment flow.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="icon">02</span>Flowchart Evolution</h2>
+      <div class="gallery">
+        <figure>
+          <svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Early flowchart showing raw input to JSON output">
+            <defs>
+              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.4" />
+                <stop offset="100%" stop-color="#60a5fa" stop-opacity="0.4" />
+              </linearGradient>
+            </defs>
+            <rect width="400" height="240" fill="#111827" rx="14" />
+            <g stroke="#22d3ee" stroke-width="2" fill="url(#grad)" font-family="Inter" font-size="13" stroke-linecap="round">
+              <rect x="24" y="24" width="120" height="52" rx="10" />
+              <text x="84" y="54" text-anchor="middle" fill="#e2e8f0">Raw mzML</text>
+              <rect x="150" y="104" width="120" height="52" rx="10" />
+              <text x="210" y="134" text-anchor="middle" fill="#e2e8f0">Parse MS1</text>
+              <rect x="276" y="184" width="100" height="40" rx="10" />
+              <text x="326" y="209" text-anchor="middle" fill="#e2e8f0">JSON</text>
+              <path d="M84 76 L84 104" stroke-dasharray="6 6" />
+              <path d="M84 104 L150 130" marker-end="url(#arrow)" />
+              <path d="M270 130 L326 184" marker-end="url(#arrow)" />
+            </g>
+            <defs>
+              <marker id="arrow" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
+                <path d="M0,0 L12,6 L0,12 Z" fill="#22d3ee" />
+              </marker>
+            </defs>
+          </svg>
+          <figcaption>Starting point: a simple “raw input → parser → JSON” flow to validate the concept.</figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flowchart with GUI branch and validation">
+            <rect width="400" height="240" fill="#111827" rx="14" />
+            <g stroke="#38bdf8" stroke-width="2" fill="none" font-family="Inter" font-size="13" stroke-linecap="round">
+              <rect x="26" y="30" width="110" height="44" rx="9" fill="rgba(34,211,238,0.18)" />
+              <text x="81" y="57" text-anchor="middle" fill="#e2e8f0">mzML Input</text>
+              <rect x="156" y="30" width="110" height="44" rx="9" fill="rgba(96,165,250,0.15)" />
+              <text x="211" y="57" text-anchor="middle" fill="#e2e8f0">Parser</text>
+              <rect x="286" y="30" width="90" height="44" rx="9" fill="rgba(52,211,153,0.15)" />
+              <text x="331" y="57" text-anchor="middle" fill="#e2e8f0">JSON</text>
+              <rect x="156" y="110" width="110" height="44" rx="9" fill="rgba(244,114,182,0.15)" />
+              <text x="211" y="137" text-anchor="middle" fill="#e2e8f0">Validation</text>
+              <rect x="156" y="176" width="110" height="44" rx="9" fill="rgba(34,211,238,0.18)" />
+              <text x="211" y="203" text-anchor="middle" fill="#e2e8f0">GUI Hook</text>
+              <path d="M136 52 H156" marker-end="url(#arrow2)" />
+              <path d="M266 52 H286" marker-end="url(#arrow2)" />
+              <path d="M211 74 V110" marker-end="url(#arrow2)" />
+              <path d="M211 154 V176" marker-end="url(#arrow2)" />
+              <path d="M246 198 H326" marker-end="url(#arrow2)" />
+            </g>
+            <defs>
+              <marker id="arrow2" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#38bdf8" />
+              </marker>
+            </defs>
+          </svg>
+          <figcaption>Middle stage: validation and GUI integration branches were introduced to the core parser flow.</figcaption>
+        </figure>
+        <figure>
+          <svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Current flowchart with GUI, parser, graph, and export">
+            <rect width="400" height="240" fill="#111827" rx="14" />
+            <g stroke="#a5b4fc" stroke-width="2" fill="none" font-family="Inter" font-size="13" stroke-linecap="round">
+              <rect x="32" y="32" width="90" height="44" rx="9" fill="rgba(129,140,248,0.18)" />
+              <text x="77" y="59" text-anchor="middle" fill="#e2e8f0">GUI</text>
+              <rect x="160" y="32" width="90" height="44" rx="9" fill="rgba(52,211,153,0.18)" />
+              <text x="205" y="59" text-anchor="middle" fill="#e2e8f0">Parser</text>
+              <rect x="288" y="32" width="90" height="44" rx="9" fill="rgba(56,189,248,0.18)" />
+              <text x="333" y="59" text-anchor="middle" fill="#e2e8f0">JSON</text>
+              <rect x="96" y="126" width="90" height="44" rx="9" fill="rgba(248,113,113,0.18)" />
+              <text x="141" y="153" text-anchor="middle" fill="#e2e8f0">Graph</text>
+              <rect x="224" y="126" width="100" height="44" rx="9" fill="rgba(16,185,129,0.2)" />
+              <text x="274" y="153" text-anchor="middle" fill="#e2e8f0">Export / CSV</text>
+              <path d="M122 76 L122 126" marker-end="url(#arrow3)" />
+              <path d="M182 54 H160" marker-end="url(#arrow3)" />
+              <path d="M250 54 H288" marker-end="url(#arrow3)" />
+              <path d="M180 148 H224" marker-end="url(#arrow3)" />
+              <path d="M328 76 L328 126" marker-end="url(#arrow3)" />
+            </g>
+            <defs>
+              <marker id="arrow3" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                <path d="M0,0 L10,5 L0,10 Z" fill="#a5b4fc" />
+              </marker>
+            </defs>
+          </svg>
+          <figcaption>Current picture: GUI, parser, graphing, and export pathways now connect to deliver a full workflow.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2><span class="icon">03</span>GUI & Graph Moments</h2>
+      <p>Snapshots pulled from the README capture how the interface matured from a simple loader to a guided, multi-step experience.</p>
+      <div class="gallery">
+        <figure>
+          <img src="images/main_gui.png" alt="Main GUI window" />
+          <figcaption>Starting interface that framed the workflow.</figcaption>
+        </figure>
+        <figure>
+          <img src="images/file_selection.png" alt="File selection dialog" />
+          <figcaption>File picker guiding users to load <code>.mzML</code> inputs.</figcaption>
+        </figure>
+        <figure>
+          <img src="images/graph_example.png" alt="Graph output example" />
+          <figcaption>Graph view showcasing extracted spectra and calculations.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2><span class="icon">04</span>Highlights</h2>
+      <div class="summary-grid">
+        <div class="card">
+          <h3>Data Integrity</h3>
+          <p>MS level 1 filtering ensures we stay focused on the spectra that matter for quick exploratory analysis.</p>
+        </div>
+        <div class="card">
+          <h3>Speed to Insight</h3>
+          <p>The GUI abstracts boilerplate steps—select a file, pick a chemical, view the plot—reducing clicks to insights.</p>
+        </div>
+        <div class="card">
+          <h3>Export-Ready</h3>
+          <p>Graph outputs can be exported for reports, making it easy to share results with collaborators.</p>
+        </div>
+      </div>
+    </section>
+
+    <p class="footer-note">Ready for GitHub Pages: drop this repository into a Pages-enabled branch and the story goes live.</p>
+  </main>
+</body>
+</html>
