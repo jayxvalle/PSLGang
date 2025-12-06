@@ -4,146 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>mzML Parser & GUI Journey</title>
-  <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --accent: #22d3ee;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --card: #1e293b;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
-      background: radial-gradient(circle at 20% 20%, rgba(34,211,238,0.08), transparent 25%),
-                  radial-gradient(circle at 80% 0%, rgba(94,234,212,0.08), transparent 20%),
-                  var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-    header {
-      background: linear-gradient(135deg, rgba(34,211,238,0.1), rgba(94,234,212,0.08));
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-      padding: 48px 20px 32px;
-      text-align: center;
-    }
-    header h1 {
-      margin: 0 0 12px;
-      font-size: clamp(32px, 4vw, 46px);
-      letter-spacing: -0.02em;
-    }
-    header p {
-      margin: 0 auto;
-      max-width: 860px;
-      color: var(--muted);
-      font-size: 18px;
-    }
-    .container { max-width: 1100px; margin: 0 auto; padding: 32px 20px 72px; }
-    section { margin-bottom: 48px; }
-    h2 {
-      font-size: 24px;
-      margin-bottom: 16px;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }
-    h2 span.icon {
-      display: inline-grid;
-      place-items: center;
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: rgba(34,211,238,0.14);
-      color: var(--accent);
-      font-weight: 700;
-    }
-    .panel {
-      background: var(--panel);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 14px;
-      padding: 16px 18px;
-      height: 100%;
-    }
-    .card h3 { margin: 0 0 8px; font-size: 17px; }
-    .card p { margin: 0; color: var(--muted); }
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 18px;
-      margin-top: 16px;
-    }
-    figure {
-      margin: 0;
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 14px;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-    }
-    figure img, figure svg { width: 100%; display: block; }
-    figure figcaption {
-      padding: 12px 14px 14px;
-      color: var(--muted);
-      font-size: 14px;
-      border-top: 1px solid rgba(255,255,255,0.05);
-    }
-    .timeline {
-      position: relative;
-      padding-left: 16px;
-      border-left: 2px dashed rgba(255,255,255,0.08);
-      display: grid;
-      gap: 18px;
-    }
-    .timeline-step {
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 12px;
-      padding: 14px 16px;
-      position: relative;
-    }
-    .timeline-step::before {
-      content: "";
-      position: absolute;
-      left: -18px;
-      top: 18px;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 4px rgba(34,211,238,0.15);
-    }
-    .footer-note {
-      text-align: center;
-      color: var(--muted);
-      font-size: 14px;
-      margin-top: 40px;
-    }
-    a { color: var(--accent); }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
     <h1>Journey of the mzML Parser & GUI Pipeline</h1>
-    <p>From our first sketches to a working pipeline with an interactive GUI, this page captures the milestones that shaped the project and the visuals that guided each step.</p>
+    <p>From our first sketches to a working pipeline with an interactive GUI, this page captures the milestones that shaped the
+    project and the visuals that guided each step.</p>
   </header>
 
+  <nav>
+    <div class="navbar">
+      <strong>Project story</strong>
+      <div class="nav-links">
+        <a href="#overview">Overview</a>
+        <a href="#flowcharts">Flowcharts</a>
+        <a href="#gallery">GUI & Graphs</a>
+        <a href="#highlights">Highlights</a>
+      </div>
+    </div>
+  </nav>
+
   <main class="container">
-    <section class="panel">
+    <section id="overview" class="panel">
       <h2><span class="icon">01</span>What We Built</h2>
       <div class="summary-grid">
         <div class="card">
@@ -159,9 +42,16 @@
           <p>Provides quick plots of extracted spectra and offers export-ready views that document the experiment flow.</p>
         </div>
       </div>
+
+      <div class="badge-grid">
+        <div class="badge"><span>Py</span>Python + PyQt5 stack</div>
+        <div class="badge"><span>MS</span>MS1 spectra focus</div>
+        <div class="badge"><span>JS</span>Ready for static hosting</div>
+        <div class="badge"><span>UX</span>Guided, stepwise workflow</div>
+      </div>
     </section>
 
-    <section>
+    <section id="flowcharts">
       <h2><span class="icon">02</span>Flowchart Evolution</h2>
       <div class="gallery">
         <figure>
@@ -251,7 +141,7 @@
       </div>
     </section>
 
-    <section class="panel">
+    <section id="gallery" class="panel">
       <h2><span class="icon">03</span>GUI & Graph Moments</h2>
       <p>Snapshots pulled from the README capture how the interface matured from a simple loader to a guided, multi-step experience.</p>
       <div class="gallery">
@@ -270,7 +160,7 @@
       </div>
     </section>
 
-    <section class="panel">
+    <section id="highlights" class="panel">
       <h2><span class="icon">04</span>Highlights</h2>
       <div class="summary-grid">
         <div class="card">
@@ -290,5 +180,8 @@
 
     <p class="footer-note">Ready for GitHub Pages: drop this repository into a Pages-enabled branch and the story goes live.</p>
   </main>
+
+  <button class="back-to-top" type="button" aria-label="Back to top">↑ Back to top</button>
+  <script src="script.js"></script>
 </body>
 </html>
