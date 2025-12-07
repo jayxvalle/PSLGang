@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 420" role="img" aria-label="Current pipeline overview with MZMine, SIRIUS, and EPA test">
+  <style>
+    .title{font-family:'Inter','Segoe UI',sans-serif;font-size:17px;font-weight:700;fill:#f8f3ff}
+    .subtitle{font-family:'Inter','Segoe UI',sans-serif;font-size:13px;font-weight:600;fill:#e5d9ff}
+    .note{font-family:'Inter','Segoe UI',sans-serif;font-size:13px;font-weight:600;fill:#f25f5c}
+  </style>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2c0b28"/>
+      <stop offset="100%" stop-color="#1e0121"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
+      <path d="M0 0 L12 6 L0 12 Z" fill="#b8a3ff"/>
+    </marker>
+  </defs>
+  <rect width="840" height="420" rx="16" fill="url(#bg)"/>
+
+  <g stroke="#b8a3ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M420 92 V140" marker-end="url(#arrow)"/>
+    <path d="M210 170 H322" marker-end="url(#arrow)"/>
+    <path d="M518 170 H630" marker-end="url(#arrow)"/>
+    <path d="M420 210 V260" marker-end="url(#arrow)"/>
+    <path d="M152 274 H392" marker-end="url(#arrow)"/>
+  </g>
+
+  <rect x="320" y="36" width="200" height="70" rx="14" fill="#4a1244" stroke="#c43d7d" stroke-width="2"/>
+  <text class="title" x="420" y="78" text-anchor="middle">LCMS Data Collection</text>
+
+  <rect x="70" y="146" width="200" height="70" rx="14" fill="#4a1244" stroke="#c43d7d" stroke-width="2"/>
+  <text class="title" x="170" y="182" text-anchor="middle">MFAssignR</text>
+  <text class="subtitle" x="170" y="202" text-anchor="middle">(Formula Prediction)</text>
+
+  <rect x="320" y="146" width="200" height="70" rx="14" fill="#3b0c49" stroke="#c43d7d" stroke-width="2"/>
+  <text class="title" x="420" y="182" text-anchor="middle">MZMine</text>
+  <text class="subtitle" x="420" y="202" text-anchor="middle">(feature finding)</text>
+
+  <rect x="570" y="146" width="200" height="70" rx="14" fill="#3b0c49" stroke="#c43d7d" stroke-width="2"/>
+  <text class="title" x="670" y="182" text-anchor="middle">Database Matching</text>
+  <text class="subtitle" x="670" y="202" text-anchor="middle">within MZMine</text>
+
+  <rect x="320" y="260" width="200" height="70" rx="14" fill="#3b0c49" stroke="#c43d7d" stroke-width="2"/>
+  <text class="title" x="420" y="296" text-anchor="middle">SiRiUS</text>
+  <text class="subtitle" x="420" y="316" text-anchor="middle">(Formula prediction)</text>
+
+  <rect x="50" y="248" width="200" height="70" rx="14" fill="#7c142e" stroke="#f25f5c" stroke-width="2"/>
+  <text class="title" x="150" y="284" text-anchor="middle">EPA Test</text>
+  <text class="subtitle" x="150" y="304" text-anchor="middle">(Toxicity Prediction)</text>
+
+  <text class="note" x="670" y="236" text-anchor="middle">m/z quantions</text>
+</svg>

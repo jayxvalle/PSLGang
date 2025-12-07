@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 640" role="img" aria-label="Original LCMS to graph flowchart">
+  <style>
+    .label{font-family:'Inter', 'Segoe UI', sans-serif;font-size:13px;font-weight:600;fill:#222}
+  </style>
+  <rect width="340" height="640" fill="#f8f8f8"/>
+  <rect x="66" y="24" width="208" height="60" rx="10" fill="#6aa3d4" stroke="#285680" stroke-width="2"/>
+  <text class="label" x="170" y="58" text-anchor="middle">LCMS Data Collection (.mzML file)</text>
+
+  <rect x="74" y="114" width="192" height="60" rx="10" fill="#5bc0ac" stroke="#18765f" stroke-width="2"/>
+  <text class="label" x="170" y="145" text-anchor="middle">MZMine (Initial Feature Finding / Optional Use)</text>
+
+  <rect x="58" y="204" width="224" height="60" rx="10" fill="#9fe69f" stroke="#3c8a3c" stroke-width="2"/>
+  <text class="label" x="170" y="222" text-anchor="middle">GUI Upload: Select mzML → Extract MS1 Spectra</text>
+
+  <rect x="62" y="294" width="216" height="60" rx="10" fill="#ffe58f" stroke="#cc9a00" stroke-width="2"/>
+  <text class="label" x="170" y="325" text-anchor="middle">Parser.py: Full MS1 Array Extraction</text>
+  <text class="label" x="170" y="341" text-anchor="middle">(m/z + Intensity)</text>
+
+  <rect x="58" y="384" width="224" height="72" rx="10" fill="#f6a7a7" stroke="#a23030" stroke-width="2"/>
+  <text class="label" x="170" y="413" text-anchor="middle">Graph.py: Kendrick Mass Defect (KMD) Calculation</text>
+  <text class="label" x="170" y="430" text-anchor="middle">(Fractional/Rounded KMD + Signal Filtering + Band)</text>
+
+  <rect x="32" y="488" width="276" height="84" rx="10" fill="#ffbe6f" stroke="#c26b00" stroke-width="2"/>
+  <text class="label" x="170" y="517" text-anchor="middle">Graph.py: Peak Matching &amp; CSV Export</text>
+  <text class="label" x="170" y="534" text-anchor="middle">(Includes Base Peak Overlay + Outlier Trimming)</text>
+
+  <g stroke="#222" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M170 84 V114" marker-end="url(#arrow)"/>
+    <path d="M170 174 V204" marker-end="url(#arrow)"/>
+    <path d="M170 264 V294" marker-end="url(#arrow)"/>
+    <path d="M170 354 V384" marker-end="url(#arrow)"/>
+    <path d="M170 456 V488" marker-end="url(#arrow)"/>
+  </g>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
+      <path d="M0 0 L12 6 L0 12 Z" fill="#222" />
+    </marker>
+  </defs>
+</svg>
