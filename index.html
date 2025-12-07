@@ -68,88 +68,12 @@
       <h2><span class="icon">02</span>Flowchart Evolution</h2>
       <div class="gallery">
         <figure>
-          <svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Early flowchart showing raw input to JSON output">
-            <defs>
-              <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.4" />
-                <stop offset="100%" stop-color="#60a5fa" stop-opacity="0.4" />
-              </linearGradient>
-            </defs>
-            <rect width="400" height="240" fill="#111827" rx="14" />
-            <g stroke="#22d3ee" stroke-width="2" fill="url(#grad)" font-family="Inter" font-size="13" stroke-linecap="round">
-              <rect x="24" y="24" width="120" height="52" rx="10" />
-              <text x="84" y="54" text-anchor="middle" fill="#e2e8f0">Raw mzML</text>
-              <rect x="150" y="104" width="120" height="52" rx="10" />
-              <text x="210" y="134" text-anchor="middle" fill="#e2e8f0">Parse MS1</text>
-              <rect x="276" y="184" width="100" height="40" rx="10" />
-              <text x="326" y="209" text-anchor="middle" fill="#e2e8f0">JSON</text>
-              <path d="M84 76 L84 104" stroke-dasharray="6 6" />
-              <path d="M84 104 L150 130" marker-end="url(#arrow)" />
-              <path d="M270 130 L326 184" marker-end="url(#arrow)" />
-            </g>
-            <defs>
-              <marker id="arrow" markerWidth="12" markerHeight="12" refX="6" refY="6" orient="auto">
-                <path d="M0,0 L12,6 L0,12 Z" fill="#22d3ee" />
-              </marker>
-            </defs>
-          </svg>
-          <figcaption>Starting point: a simple “raw input → parser → JSON” flow to validate the concept.</figcaption>
+          <img src="images/flowchart_early.svg" alt="Initial vertical flowchart starting from LCMS data collection" />
+          <figcaption>Starting point: the red-and-pastel flow used during our earliest LCMS data collection and parser experiments.</figcaption>
         </figure>
         <figure>
-          <svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Flowchart with GUI branch and validation">
-            <rect width="400" height="240" fill="#111827" rx="14" />
-            <g stroke="#38bdf8" stroke-width="2" fill="none" font-family="Inter" font-size="13" stroke-linecap="round">
-              <rect x="26" y="30" width="110" height="44" rx="9" fill="rgba(34,211,238,0.18)" />
-              <text x="81" y="57" text-anchor="middle" fill="#e2e8f0">mzML Input</text>
-              <rect x="156" y="30" width="110" height="44" rx="9" fill="rgba(96,165,250,0.15)" />
-              <text x="211" y="57" text-anchor="middle" fill="#e2e8f0">Parser</text>
-              <rect x="286" y="30" width="90" height="44" rx="9" fill="rgba(52,211,153,0.15)" />
-              <text x="331" y="57" text-anchor="middle" fill="#e2e8f0">JSON</text>
-              <rect x="156" y="110" width="110" height="44" rx="9" fill="rgba(244,114,182,0.15)" />
-              <text x="211" y="137" text-anchor="middle" fill="#e2e8f0">Validation</text>
-              <rect x="156" y="176" width="110" height="44" rx="9" fill="rgba(34,211,238,0.18)" />
-              <text x="211" y="203" text-anchor="middle" fill="#e2e8f0">GUI Hook</text>
-              <path d="M136 52 H156" marker-end="url(#arrow2)" />
-              <path d="M266 52 H286" marker-end="url(#arrow2)" />
-              <path d="M211 74 V110" marker-end="url(#arrow2)" />
-              <path d="M211 154 V176" marker-end="url(#arrow2)" />
-              <path d="M246 198 H326" marker-end="url(#arrow2)" />
-            </g>
-            <defs>
-              <marker id="arrow2" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
-                <path d="M0,0 L10,5 L0,10 Z" fill="#38bdf8" />
-              </marker>
-            </defs>
-          </svg>
-          <figcaption>Middle stage: validation and GUI integration branches were introduced to the core parser flow.</figcaption>
-        </figure>
-        <figure>
-          <svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Current flowchart with GUI, parser, graph, and export">
-            <rect width="400" height="240" fill="#111827" rx="14" />
-            <g stroke="#a5b4fc" stroke-width="2" fill="none" font-family="Inter" font-size="13" stroke-linecap="round">
-              <rect x="32" y="32" width="90" height="44" rx="9" fill="rgba(129,140,248,0.18)" />
-              <text x="77" y="59" text-anchor="middle" fill="#e2e8f0">GUI</text>
-              <rect x="160" y="32" width="90" height="44" rx="9" fill="rgba(52,211,153,0.18)" />
-              <text x="205" y="59" text-anchor="middle" fill="#e2e8f0">Parser</text>
-              <rect x="288" y="32" width="90" height="44" rx="9" fill="rgba(56,189,248,0.18)" />
-              <text x="333" y="59" text-anchor="middle" fill="#e2e8f0">JSON</text>
-              <rect x="96" y="126" width="90" height="44" rx="9" fill="rgba(248,113,113,0.18)" />
-              <text x="141" y="153" text-anchor="middle" fill="#e2e8f0">Graph</text>
-              <rect x="224" y="126" width="100" height="44" rx="9" fill="rgba(16,185,129,0.2)" />
-              <text x="274" y="153" text-anchor="middle" fill="#e2e8f0">Export / CSV</text>
-              <path d="M122 76 L122 126" marker-end="url(#arrow3)" />
-              <path d="M182 54 H160" marker-end="url(#arrow3)" />
-              <path d="M250 54 H288" marker-end="url(#arrow3)" />
-              <path d="M180 148 H224" marker-end="url(#arrow3)" />
-              <path d="M328 76 L328 126" marker-end="url(#arrow3)" />
-            </g>
-            <defs>
-              <marker id="arrow3" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
-                <path d="M0,0 L10,5 L0,10 Z" fill="#a5b4fc" />
-              </marker>
-            </defs>
-          </svg>
-          <figcaption>Current picture: GUI, parser, graphing, and export pathways now connect to deliver a full workflow.</figcaption>
+          <img src="images/flowchart_current.svg" alt="Purple flowchart showing the current LCMS, MZMine, SIRIUS, and EPA pipeline" />
+          <figcaption>Current picture: the darker, purple chart that maps LCMS intake through MZMine, SIRIUS, and EPA toxicity checks.</figcaption>
         </figure>
       </div>
     </section>
