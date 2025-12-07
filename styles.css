@@ -198,6 +198,10 @@ figure img,
 figure svg {
   width: 100%;
   display: block;
+  max-height: 360px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 10px;
 }
 
 figure figcaption {
