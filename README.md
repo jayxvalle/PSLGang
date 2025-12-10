@@ -27,15 +27,19 @@ This project provides:
 │   └── CVBS_1_Dis_neg_1.json      # Example .mzML file converted to JSON
 ├── gui/
 │   └── gui.py                     # GUI for selecting files and chemicals
-├── images/
-│   └── file_selection.png                     # Example Previews
+├── images/                        # Example Previews
+│   └── file_selection.png
 │   └── graph_example.png
 │   └── main_gui.png
 ├── Pipeline/
 │   ├── Graph.py                   # Functions for graphing chemical data (planned)
 │   └── Parser.py                  # Parses .mzML files and outputs JSON
+├── Documentation.pdf
+├── index.html                     # Defines local page structure and content
 ├── pip-requirements.txt           # Dependencies used
 ├── README.md                      # Project overview, installation, and usage instructions
+├── script.js                      # Contains JavaScript for interactivity and handling events
+├── styles.css                     # Local website styling
 └── TranslatedRscript.py           # Python translation of R’s KMDNoise function
 ```
 
@@ -140,3 +144,16 @@ After selecting a chemical (currently CH2 for testing) and pressing **Continue**
 ![Graph Example](images/graph_example.png)
 
 ---
+
+### Running the Website (Local Web Server)
+1. Start the Local Server
+    - From the project's root directory, run:
+      ```bash
+      python -m http.server 8080
+      ```
+2. View the Site
+    - Open your browser and go to:
+      ```bash
+      http://127.0.0.1:8080/
+      ```
+- You should now see the active site running locally.
